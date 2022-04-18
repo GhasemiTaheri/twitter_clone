@@ -75,3 +75,14 @@ def new_post(request):
     post = Post.objects.create(text=data['post_content'], owner_id=request.user.id)
     post.save()
     return JsonResponse({"success": "post add successfully"}, status=201)
+
+
+@csrf_exempt
+def all_post(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "POST request required."}, status=400)
+
+    off_set = json.loads(request.body)
+    posts = Post.objects.all().order_by("-create_date")[off_set['index']:off_set['index'] + 10]
+
+    return JsonResponse([post.serialize(request.user) for post in posts], safe=False)
