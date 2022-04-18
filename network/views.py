@@ -79,11 +79,10 @@ def new_post(request):
 
 @csrf_exempt
 def all_post(request):
-    if request.method != "GET":
-        return JsonResponse({"error": "Get request required."}, status=400)
+    if request.method != "POST":
+        return JsonResponse({"error": "POST request required."}, status=400)
 
-    start = int(request.GET.get('start') or 0)
-    end = int(request.GET.get('end') or start + 10)
-    posts = Post.objects.all().order_by("-create_date")[start:end]
+    off_set = json.loads(request.body)
+    posts = Post.objects.all().order_by("-create_date")[off_set['index']:off_set['index'] + 10]
 
     return JsonResponse([post.serialize(request.user) for post in posts], safe=False)

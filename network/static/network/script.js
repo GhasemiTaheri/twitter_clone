@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
-    document.querySelector("#new-post-form").onsubmit = function (e) {
-        e.preventDefault();
+    //َAdd new post
+    document.querySelector("#new-post-form").onsubmit = function () {
         const post_content = document.querySelector("#new-post-content");
         if (post_content.value.trim()) {
 
@@ -9,23 +9,43 @@ document.addEventListener("DOMContentLoaded", function () {
                 body: JSON.stringify({
                     post_content: post_content.value,
                 })
-            }).then(response => response.json())
+            })
+                .then(response => response.json())
                 .then(data => {
                     post_content.value = '';
-                    alert("Post added");
+                    document.querySelector("#all-posts").innerHTML = "";
+                    load_all_post();
+                    alert(data.success);
                 });
 
+        } else {
+            alert("Please write a text");
+        }
+        return false;
+    }
+
+    window.onscroll = function () {
+        if (window.scrollY + window.innerHeight >= document.body.offsetHeight) {
+            post_index += 10;
+            load_all_post();
         }
     }
+
     load_all_post();
 });
+
+let post_index = 0;
 
 function load_all_post() {
 
     const all_post = document.querySelector("#all-posts");
 
-    fetch("/all_post")
-        .then(response => response.json())
+    fetch("/all_post", {
+        method: "POST",
+        body: JSON.stringify({
+            index: post_index,
+        })
+    }).then(response => response.json())
         .then(data => {
             data.forEach(post => {
                 let node = document.createElement("div");
