@@ -50,7 +50,7 @@ function load_all_post() {
             data.forEach(post => {
                 let node = document.createElement("div");
                 node.className = "post border m-3 p-3";
-                node.innerHTML = `<div><h5>${post.owner} <small>Follow</small></h5><small style="float: right;">${post.create_date}</small> </div>
+                node.innerHTML = `<div><h5><a href="/user/${post.owner}">${post.owner}</a> <small>Follow</small></h5><small style="float: right;">${post.create_date}</small> </div>
                                 <p>${post.text}</p>
                                 <i class="bi bi-heart" title="like"></i>
                                 <small>Likes ${post.likes}</small>`;

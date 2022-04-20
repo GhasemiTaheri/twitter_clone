@@ -2,7 +2,7 @@ import json
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -86,3 +86,28 @@ def all_post(request):
     posts = Post.objects.all().order_by("-create_date")[off_set['index']:off_set['index'] + 10]
 
     return JsonResponse([post.serialize(request.user) for post in posts], safe=False)
+
+
+def profile_view(request, username):
+    user = get_object_or_404(User, username=username)
+    if request.method == "POST":
+        if user in request.user.followers.all():
+            request.user.followers.remove(user)
+        else:
+            request.user.followers.add(user)
+
+        return HttpResponseRedirect(reverse('profile_view',  kwargs={'username': username}))
+
+    it_self = False
+    follow = False
+    if user == request.user:
+        it_self = True
+    else:
+        if user in request.user.followers.all():
+            follow = True
+
+    return render(request, 'network/profile.html', {
+        'profile': user,
+        'it_self': it_self,
+        'follow': follow
+    })

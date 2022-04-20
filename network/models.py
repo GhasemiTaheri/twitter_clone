@@ -3,7 +3,7 @@ from django.db import models
 
 
 class User(AbstractUser):
-    followers = models.ManyToManyField(to='User')
+    followers = models.ManyToManyField(to='User', related_name='connect_people')
 
 
 class Post(models.Model):
