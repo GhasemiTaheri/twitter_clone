@@ -1,5 +1,6 @@
 import json
 from django.contrib.auth import authenticate, login, logout
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
@@ -77,13 +78,22 @@ def new_post(request):
     return JsonResponse({"success": "post add successfully"}, status=201)
 
 
-def load_post(request, type):
-    if type == "all":
+def load_post(request):
+    if request.path == "/":
         posts = Post.objects.all().order_by("-create_date")
-    elif type == "following":
+    elif request.path == "/following-post":
         posts = Post.objects.filter(owner__in=request.user.followers.all()).order_by("-create_date")
 
-    return JsonResponse([post.serialize(request.user) for post in posts], safe=False)
+    paginator = Paginator(posts, 10)
+    page_num = request.GET.get('page_num')
+    try:
+        posts = paginator.page(page_num)
+    except PageNotAnInteger:
+        posts = paginator.page(1)
+    except EmptyPage:
+        posts = paginator.page(paginator.num_pages)
+
+    return render(request, "network/index.html", {'posts': posts, 'page': page_num})
 
 
 def profile_view(request, username):
