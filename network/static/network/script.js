@@ -1,50 +1,54 @@
 document.addEventListener("DOMContentLoaded", function () {
-    //َAdd new post
-    document.querySelector("#new-post-form").onsubmit = function () {
-        const post_content = document.querySelector("#new-post-content");
-        if (post_content.value.trim()) {
+    // َAdd new post
+    document.querySelector("#new-post-form").onsubmit = add_new_post;
 
-            fetch("/new_post", {
-                method: "post",
-                body: JSON.stringify({
-                    post_content: post_content.value,
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    post_content.value = '';
-                    document.querySelector("#all-posts").innerHTML = "";
-                    load_all_post();
-                    alert(data.success);
-                });
+    // // Infinite scroll
+    // window.onscroll = function () {
+    //     if (window.scrollY + window.innerHeight >= document.body.offsetHeight) {
+    //         post_index += 10;
+    //         load_post();
+    //     }
+    // }
 
-        } else {
-            alert("Please write a text");
-        }
-        return false;
-    }
-
-    window.onscroll = function () {
-        if (window.scrollY + window.innerHeight >= document.body.offsetHeight) {
-            post_index += 10;
-            load_all_post();
-        }
-    }
-
-    load_all_post();
+    load_post();
 });
 
-let post_index = 0;
+// let post_index = 0;
 
-function load_all_post() {
+function add_new_post() {
+    const post_content = document.querySelector("#new-post-content");
+    if (post_content.value.trim()) {
+
+        fetch("/new_post", {
+            method: "post",
+            body: JSON.stringify({
+                post_content: post_content.value,
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                post_content.value = '';
+                load_post();
+                alert(data.success);
+            });
+
+    } else {
+        alert("Please write a text");
+    }
+    return false;
+}
+
+function load_post() {
+    let type;
+    if (window.location.pathname === "/following-post")
+        type = "following";
+    else
+        type = "all";
 
     const all_post = document.querySelector("#all-posts");
 
-    fetch("/all_post", {
-        method: "POST",
-        body: JSON.stringify({
-            index: post_index,
-        })
+    fetch(`/load_post/${type}`, {
+        method: "Get"
     }).then(response => response.json())
         .then(data => {
             data.forEach(post => {
@@ -58,4 +62,6 @@ function load_all_post() {
                 all_post.append(node);
             });
         });
+
+
 }

@@ -1,3 +1,7 @@
 .post h5 {
     display: inline;
 }
+
+.nav-link{
+    cursor: pointer;
+}

@@ -77,13 +77,11 @@ def new_post(request):
     return JsonResponse({"success": "post add successfully"}, status=201)
 
 
-@csrf_exempt
-def all_post(request):
-    if request.method != "POST":
-        return JsonResponse({"error": "POST request required."}, status=400)
-
-    off_set = json.loads(request.body)
-    posts = Post.objects.all().order_by("-create_date")[off_set['index']:off_set['index'] + 10]
+def load_post(request, type):
+    if type == "all":
+        posts = Post.objects.all().order_by("-create_date")
+    elif type == "following":
+        posts = Post.objects.filter(owner__in=request.user.followers.all()).order_by("-create_date")
 
     return JsonResponse([post.serialize(request.user) for post in posts], safe=False)
 
@@ -96,7 +94,7 @@ def profile_view(request, username):
         else:
             request.user.followers.add(user)
 
-        return HttpResponseRedirect(reverse('profile_view',  kwargs={'username': username}))
+        return HttpResponseRedirect(reverse('profile_view', kwargs={'username': username}))
 
     it_self = False
     follow = False
