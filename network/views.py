@@ -119,3 +119,18 @@ def profile_view(request, username):
         'it_self': it_self,
         'follow': follow
     })
+
+
+@csrf_exempt
+def update_post(request):
+    if request.method != "PUT":
+        return JsonResponse({"error": "PUT request required."}, status=400)
+
+    data = json.loads(request.body)
+    post = Post.objects.get(id=data['post_id'])
+    if post.owner == request.user:
+        post.text = data['content']
+        post.save()
+    else:
+        return JsonResponse({"error": "post updated faild"}, status=400)
+    return JsonResponse({"success": "post updated successfully"}, status=201)

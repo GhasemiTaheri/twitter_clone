@@ -1,6 +1,22 @@
 {% extends "network/layout.html" %}
 {% load static %}
 {% block body %}
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal" style="display: none;">
+
+        <!-- Modal content -->
+        <div class="modal-content p-3 border">
+            <span class="close">&times;</span>
+            <form id="update-post-form">
+                <h5>Update Post</h5>
+                <textarea class="form-control mb-2" id="update-post-input" rows="3"></textarea>
+                <button type="submit" class="btn btn-primary mb-2">Update Post!</button>
+            </form>
+        </div>
+
+    </div>
+
     <div class="row border-bottom p-2">
         <div class="col">
             <h2 class="d-flex justify-content-center">{{ profile.username }}</h2>
@@ -21,6 +37,7 @@
                     </div>
                 </form>
             {% endif %}
+
         </div>
     </div>
 
@@ -29,15 +46,20 @@
             {% if profile.post_owner %}
                 {% for x in profile.post_owner.all|dictsortreversed:"create_date" %}
                     <div class="post border m-3 p-3">
-                        <div>
+                        <div class="post-info">
                             <h5>
                                 {{ profile.username }}
                             </h5>
+                            {% if it_self %}
+                                <a data-id="{{ x.id }}" class="edit-post"><small>Edit Post</small></a>
+                            {% endif %}
                             <small style="float: right;">{{ x.create_date }}</small>
                         </div>
-                        <p>{{ x.text }}</p>
-                        <i class="bi bi-heart" title="like"></i>
-                        <small>Likes {{ x.like }}</small>
+                        <div class="post-content">
+                            <p>{{ x.text }}</p>
+                            <i class="bi bi-heart" title="like"></i>
+                            <small>Likes {{ x.like }}</small>
+                        </div>
                     </div>
                 {% endfor %}
             {% else %}
@@ -46,5 +68,9 @@
 
         </div>
     </div>
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'network/editpost.js' %}"></script>
 {% endblock %}
 
