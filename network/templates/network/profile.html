@@ -15,7 +15,6 @@
                 <button type="submit" class="btn btn-primary mb-2">Update Post!</button>
             </form>
         </div>
-
     </div>
 
     <div class="row border-bottom p-2">
@@ -26,7 +25,7 @@
                 <span class="mx-5">{{ profile.followers.count }} following</span>
                 <span>{{ profile.connect_people.count }} follower</span>
             </div>
-            {% if not it_self %}
+            {% if not it_self and user.is_authenticated %}
                 <form method="post" action="{% url 'profile_view' profile.username %}">
                     {% csrf_token %}
                     <div class="d-flex justify-content-center">
@@ -55,17 +54,16 @@
                             <small style="float: right;">{{ x.create_date }}</small>
                         </div>
                         <p>{{ x.text }}</p>
-
-                        {% is_like user x as is_user_like_this %}
-                        {% if is_user_like_this %}
-                            <i class="bi bi-heart-fill like-button" style="color: #dc3545" title="unlike"
-                               data-id="{{ x.id }}"></i>
-                        {% else %}
-                            <i class="bi bi-heart like-button" title="like" data-id="{{ x.id }}"></i>
+                        {% if user.is_authenticated %}
+                            {% is_like user x as is_user_like_this %}
+                            {% if is_user_like_this %}
+                                <i class="bi bi-heart-fill like-button" style="color: #dc3545" title="unlike"
+                                   data-id="{{ x.id }}"></i>
+                            {% else %}
+                                <i class="bi bi-heart like-button" title="like" data-id="{{ x.id }}"></i>
+                            {% endif %}
                         {% endif %}
-
                         <small>Likes {{ x.likes.count }}</small>
-
                     </div>
                 {% endfor %}
             {% else %}

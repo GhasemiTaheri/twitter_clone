@@ -27,12 +27,14 @@
                     </div>
                     <p>{{ post.text }}</p>
 
-                    {% is_like user post as is_user_like_this %}
-                    {% if is_user_like_this %}
-                        <i class="bi bi-heart-fill like-button" style="color: #dc3545" title="unlike"
-                           data-id="{{ post.id }}"></i>
-                    {% else %}
-                        <i class="bi bi-heart like-button" title="like" data-id="{{ post.id }}"></i>
+                    {% if user.is_authenticated %}
+                        {% is_like user post as is_user_like_this %}
+                        {% if is_user_like_this %}
+                            <i class="bi bi-heart-fill like-button" style="color: #dc3545" title="unlike"
+                               data-id="{{ post.id }}"></i>
+                        {% else %}
+                            <i class="bi bi-heart like-button" title="like" data-id="{{ post.id }}"></i>
+                        {% endif %}
                     {% endif %}
 
                     <small>Likes {{ post.likes.count }}</small>

@@ -2,7 +2,7 @@ import json
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.http import JsonResponse
@@ -82,7 +82,10 @@ def load_post(request):
     if request.path == "/":
         posts = Post.objects.all().order_by("-create_date")
     elif request.path == "/following-post":
-        posts = Post.objects.filter(owner__in=request.user.followers.all()).order_by("-create_date")
+        if request.user.is_authenticated:
+            posts = Post.objects.filter(owner__in=request.user.followers.all()).order_by("-create_date")
+        else:
+            return Http404("Page not found")
 
     paginator = Paginator(posts, 10)
     page_num = request.GET.get('page_num')
@@ -110,7 +113,7 @@ def profile_view(request, username):
     follow = False
     if user == request.user:
         it_self = True
-    else:
+    elif request.user.is_authenticated:
         if user in request.user.followers.all():
             follow = True
 
