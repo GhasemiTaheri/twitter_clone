@@ -134,3 +134,18 @@ def update_post(request):
     else:
         return JsonResponse({"error": "post updated faild"}, status=400)
     return JsonResponse({"success": "post updated successfully"}, status=201)
+
+
+@csrf_exempt
+def like_post(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "POST request required."}, status=400)
+
+    data = json.loads(request.body)
+    post = Post.objects.get(id=data['post_id'])
+    if post.likes.filter(id=request.user.id):
+        post.likes.remove(request.user.id)
+        return JsonResponse({"status": "remove like"}, status=201)
+    else:
+        post.likes.add(request.user.id)
+        return JsonResponse({"status": "add like"}, status=201)

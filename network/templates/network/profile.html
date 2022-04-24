@@ -1,5 +1,6 @@
 {% extends "network/layout.html" %}
 {% load static %}
+{% load like_extra %}
 {% block body %}
 
     <!-- The Modal -->
@@ -46,20 +47,25 @@
             {% if profile.post_owner %}
                 {% for x in profile.post_owner.all|dictsortreversed:"create_date" %}
                     <div class="post border m-3 p-3">
-                        <div class="post-info">
-                            <h5>
-                                {{ profile.username }}
-                            </h5>
+                        <div>
+                            <h5>{{ profile.username }}</h5>
                             {% if it_self %}
                                 <a data-id="{{ x.id }}" class="edit-post"><small>Edit Post</small></a>
                             {% endif %}
                             <small style="float: right;">{{ x.create_date }}</small>
                         </div>
-                        <div class="post-content">
-                            <p>{{ x.text }}</p>
-                            <i class="bi bi-heart" title="like"></i>
-                            <small>Likes {{ x.like }}</small>
-                        </div>
+                        <p>{{ x.text }}</p>
+
+                        {% is_like user x as is_user_like_this %}
+                        {% if is_user_like_this %}
+                            <i class="bi bi-heart-fill like-button" style="color: #dc3545" title="unlike"
+                               data-id="{{ x.id }}"></i>
+                        {% else %}
+                            <i class="bi bi-heart like-button" title="like" data-id="{{ x.id }}"></i>
+                        {% endif %}
+
+                        <small>Likes {{ x.likes.count }}</small>
+
                     </div>
                 {% endfor %}
             {% else %}
@@ -72,5 +78,6 @@
 
 {% block script %}
     <script src="{% static 'network/editpost.js' %}"></script>
+    <script src="{% static 'network/like.js' %}"></script>
 {% endblock %}
 

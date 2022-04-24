@@ -1,5 +1,7 @@
 {% extends "network/layout.html" %}
 {% load static %}
+{% load like_extra %}
+
 {% block body %}
     <h2>All Posts</h2>
     <div>
@@ -24,7 +26,15 @@
                         <small style="float: right;">{{ post.create_date }}</small>
                     </div>
                     <p>{{ post.text }}</p>
-                    <i class="bi bi-heart" title="like"></i>
+
+                    {% is_like user post as is_user_like_this %}
+                    {% if is_user_like_this %}
+                        <i class="bi bi-heart-fill like-button" style="color: #dc3545" title="unlike"
+                           data-id="{{ post.id }}"></i>
+                    {% else %}
+                        <i class="bi bi-heart like-button" title="like" data-id="{{ post.id }}"></i>
+                    {% endif %}
+
                     <small>Likes {{ post.likes.count }}</small>
                 </div>
             {% endfor %}
@@ -36,5 +46,6 @@
 {% endblock %}
 
 {% block script %}
-        <script src="{% static 'network/script.js' %}"></script>
+    <script src="{% static 'network/script.js' %}"></script>
+    <script src="{% static 'network/like.js' %}"></script>
 {% endblock %}
